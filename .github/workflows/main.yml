@@ -1,0 +1,28 @@
+name: Laravel CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          script: |
+            cd /var/www/hospitalMS
+            git pull origin main
+            # Commented out database migration and route caching steps
+            # php artisan migrate --force
+            # php artisan route:cache
